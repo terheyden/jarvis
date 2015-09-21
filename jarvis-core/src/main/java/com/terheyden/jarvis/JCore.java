@@ -1,3 +1,7 @@
+//
+// JARVIS - global, platform-aware assistance system.
+// By Luke Terheyden. Shared under the GNU General Public License v2.
+//
 package com.terheyden.jarvis;
 
 import com.terheyden.jarvis.JGlobals.RequestName;
