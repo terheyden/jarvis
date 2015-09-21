@@ -1,4 +1,4 @@
-package com.terheyden.jarvis;
+package com.terheyden.jarvis.util;
 
 public class EnglishSyntax {
 

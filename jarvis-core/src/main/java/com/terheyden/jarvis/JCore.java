@@ -4,19 +4,21 @@
 //
 package com.terheyden.jarvis;
 
-import com.terheyden.jarvis.JGlobals.RequestName;
 import com.terheyden.jarvis.action.JAction;
-import com.terheyden.jarvis.action.JActionResult;
 import com.terheyden.jarvis.data.JData;
-import com.terheyden.jarvis.io.UOutput;
+import com.terheyden.jarvis.io.UserIO;
 import com.terheyden.jarvis.request.JRequest;
+import com.terheyden.jarvis.util.EnglishSyntax;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import static com.terheyden.jarvis.JGlobals.RequestName.UNKNOWN;
+import static com.terheyden.jarvis.JGlobals.ActionName.UNKNOWN;
 
 /**
  * UInput is passed here, to the JCore.
@@ -24,19 +26,33 @@ import static com.terheyden.jarvis.JGlobals.RequestName.UNKNOWN;
  */
 public class JCore {
 
-    private final Map<RequestName, JAction> actionMap = new HashMap<>();
+    /**
+     * Map of actions, and the platform-specific class to perform it.
+     */
+    private final Map<JGlobals.ActionName, JAction> actionMap = new HashMap<>();
+
+    /**
+     * Data store / retrieve.
+     */
     private final JData data;
+
+    /**
+     * Registry of ways to communicate back to the user.
+     */
+    private final List<UserIO> outputs = new LinkedList<>();
+
+    private final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+        0,                              // Keep 0 idle threads hanging around.
+        100,                            // Jarvis can do 100 things at once, why not?
+        60L,                            // Idle threads die after 60 (units of time).
+        TimeUnit.SECONDS,               // Units of time = seconds, so idle threads die in 60 secs.
+        new LinkedBlockingQueue<>());   // Queue of worker items - unlimited, so we never reject.
 
     public JCore(JData data) {
         this.data = data;
     }
 
-    /**
-     * Registry of ways to communicate back to the user.
-     */
-    private final List<UOutput> outputs = new LinkedList<>();
-
-    public void addOutput(UOutput output) {
+    public void addOutput(UserIO output) {
         outputs.add(output);
     }
 
@@ -45,7 +61,7 @@ public class JCore {
      * @param request name of the request, "greeting"
      * @param action platform-specific class to respond, "WindowsGreeter"
      */
-    public void addAction(RequestName request, JAction action) {
+    public void addAction(JGlobals.ActionName request, JAction action) {
         actionMap.put(request, action);
     }
 
@@ -63,10 +79,15 @@ public class JCore {
         JRequest req = findMatchingRequest(input);
 
         // Convert the action name into the platform-specific version of the Action.
-        JAction jAction = actionMap.get(req.getRequestName());
+        JAction jAction = actionMap.get(req.getActionName());
 
-        // Run the action, passing in the request details for context.
-        JActionResult res = jAction.run(req);
+        // Run the action on its own thread.
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                jAction.run(req);
+            }
+        });
     }
 
     /**
@@ -91,9 +112,9 @@ public class JCore {
      * Jarvis Actions can use this to communicate with the user.
      * @param jOutput speech from Jarvis to the user who made a request
      */
-    public void sayToUser(String jOutput) {
-        for (UOutput out : outputs) {
-            out.say(jOutput);
+    public void sayToUser(String jOutput, Object... args) {
+        for (UserIO out : outputs) {
+            out.say(String.format(jOutput, args));
         }
     }
 }

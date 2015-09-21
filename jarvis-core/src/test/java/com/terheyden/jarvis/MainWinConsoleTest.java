@@ -10,9 +10,9 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Unit tests for MainConsole.
+ * Unit tests for MainWinConsole.
  */
-public class MainConsoleTest
+public class MainWinConsoleTest
 {
     /**
      * Do setup ONCE before ANY test runs.

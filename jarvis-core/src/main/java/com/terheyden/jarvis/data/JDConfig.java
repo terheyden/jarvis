@@ -1,6 +1,6 @@
 package com.terheyden.jarvis.data;
 
-import com.terheyden.jarvis.JGlobals.RequestName;
+import com.terheyden.jarvis.JGlobals.ActionName;
 import com.terheyden.jarvis.request.JRequest;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -26,16 +26,20 @@ public class JDConfig extends JData {
 
         Map<String, Object> regexActionNameMap = config.getObject("jarvis.regexActions").unwrapped();
 
-        for (String regex : regexActionNameMap.keySet()) {
+        for (Map.Entry<String, Object> entry : regexActionNameMap.entrySet()) {
 
-            Matcher matcher = Pattern.compile(regex).matcher(uInput);
+            String key = entry.getKey();
+            String val = entry.getValue().toString();
+
+            // TODO: Save the compiled patterns once.
+            Matcher matcher = Pattern.compile(val, Pattern.CASE_INSENSITIVE).matcher(uInput);
             if (!matcher.find()) {
                 continue;
             }
 
             // Found a matching Request!
-            RequestName requestName = RequestName.valueOf(regexActionNameMap.get(regex).toString());
-            return new JRequest(uInput, matcher, requestName);
+            ActionName actionName = ActionName.valueOf(key);
+            return new JRequest(uInput, matcher, actionName);
         }
 
         // Couldn't match this.

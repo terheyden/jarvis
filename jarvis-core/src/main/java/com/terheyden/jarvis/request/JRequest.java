@@ -1,7 +1,7 @@
 package com.terheyden.jarvis.request;
 
 import com.terheyden.jarvis.JGlobals;
-import com.terheyden.jarvis.JGlobals.RequestName;
+import com.terheyden.jarvis.JGlobals.ActionName;
 
 import java.util.regex.Matcher;
 
@@ -9,16 +9,16 @@ import java.util.regex.Matcher;
  * A data bag with action request details.
  * Passed as context to the matching Action.
  */
-public class JRequest {
+public class JRequest implements Runnable {
 
     private final String uInput;
     private final Matcher match;
-    private final JGlobals.RequestName requestName;
+    private final ActionName actionName;
 
-    public JRequest(String uInput, Matcher match, RequestName requestName) {
+    public JRequest(String uInput, Matcher match, JGlobals.ActionName actionName) {
         this.uInput = uInput;
         this.match = match;
-        this.requestName = requestName;
+        this.actionName = actionName;
     }
 
     public String getUInput() {
@@ -29,7 +29,12 @@ public class JRequest {
         return match;
     }
 
-    public RequestName getRequestName() {
-        return requestName;
+    public ActionName getActionName() {
+        return actionName;
+    }
+
+    @Override
+    public void run() {
+
     }
 }
