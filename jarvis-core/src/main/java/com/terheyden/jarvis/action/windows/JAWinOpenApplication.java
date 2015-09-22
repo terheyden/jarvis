@@ -31,7 +31,7 @@ public class JAWinOpenApplication extends JAction {
         String appName = request.getMatcher().group(1);
         FileMatcher appMatcher = getMenuAppMatcher(appName);
 
-        core.sayToUser("Opening \"%s\" ...", appName);
+        say("Opening \"%s\" ...", appName);
 
         File allUsersMenu = new File(System.getenv("ALLUSERSPROFILE"), menuSubDir);
         File userMenu = new File(System.getenv("APPDATA"), menuSubDir);
@@ -39,19 +39,19 @@ public class JAWinOpenApplication extends JAction {
         if (allUsersMenu.isDirectory()) {
             menuFiles.addAll(FileFindUtils.findFiles(allUsersMenu, appMatcher));
         } else {
-            core.sayToUser("Sir, I can't find the all users menu.");
+            say("Sir, I can't find the all users menu.");
             log.warn("Can't find the all users menu: {}", allUsersMenu.getAbsolutePath());
         }
 
         if (userMenu.isDirectory()) {
             menuFiles.addAll(FileFindUtils.findFiles(userMenu, appMatcher));
         } else {
-            core.sayToUser("Sir, I can't find your user menu.");
+            say("Sir, I can't find your user menu.");
             log.warn("Can't find the user menu: {}", userMenu.getAbsolutePath());
         }
 
         for (File menuFile : menuFiles) {
-            core.sayToUser("Found matching app: %s", menuFile.getName());
+            say("Found matching app: %s", menuFile.getName());
         }
         
         return ok();

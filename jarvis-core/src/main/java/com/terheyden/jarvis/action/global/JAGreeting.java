@@ -13,7 +13,7 @@ public class JAGreeting extends JAction {
 
     @Override
     public JActionResult run(JRequest request) {
-        core.sayToUser("Hello, sir.");
+        say("Hello, sir.");
         return ok();
     }
 }

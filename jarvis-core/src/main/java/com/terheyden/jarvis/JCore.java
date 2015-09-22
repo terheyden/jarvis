@@ -11,8 +11,6 @@ import com.terheyden.jarvis.request.JRequest;
 import com.terheyden.jarvis.util.EnglishSyntax;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,10 +34,7 @@ public class JCore {
      */
     private final JData data;
 
-    /**
-     * Registry of ways to communicate back to the user.
-     */
-    private final List<UserIO> outputs = new LinkedList<>();
+    private final UserIO userIO;
 
     private final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
         0,                              // Keep 0 idle threads hanging around.
@@ -48,12 +43,9 @@ public class JCore {
         TimeUnit.SECONDS,               // Units of time = seconds, so idle threads die in 60 secs.
         new LinkedBlockingQueue<>());   // Queue of worker items - unlimited, so we never reject.
 
-    public JCore(JData data) {
+    public JCore(JData data, UserIO userIO) {
         this.data = data;
-    }
-
-    public void addOutput(UserIO output) {
-        outputs.add(output);
+        this.userIO = userIO;
     }
 
     /**
@@ -109,12 +101,10 @@ public class JCore {
     }
 
     /**
-     * Jarvis Actions can use this to communicate with the user.
-     * @param jOutput speech from Jarvis to the user who made a request
+     * How we communicate with the user.
+     * @return UserIO implementation we should be using.
      */
-    public void sayToUser(String jOutput, Object... args) {
-        for (UserIO out : outputs) {
-            out.say(String.format(jOutput, args));
-        }
+    public UserIO getUserIO() {
+        return userIO;
     }
 }

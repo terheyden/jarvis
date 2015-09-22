@@ -18,10 +18,7 @@ public class MainWinConsole {
     public static void main(String... args) {
 
         // Start Jarvis for command-line interfacing.
-        JCore core = new JCore(new JDConfig());
-
-        // Add console-based I/O.
-        core.addOutput(new UIOWinConsole());
+        JCore core = new JCore(new JDConfig(), new UIOWinConsole());
 
         // Add global actions.
         core.addAction(ActionName.UNKNOWN, new JAUnknown(core));

@@ -13,7 +13,7 @@ public class JAUnknown extends JAction {
 
     @Override
     public JActionResult run(JRequest request) {
-        core.sayToUser("I'm sorry sir, I don't understand what \"%s\" means.", request.getUInput());
+        say("I'm sorry sir, I don't understand what \"%s\" means.", request.getUInput());
         return ok();
     }
 }
